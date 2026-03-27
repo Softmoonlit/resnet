@@ -18,6 +18,7 @@ BENCHMARK_STEPS="300"
 BATCH_LIST="8 16 24 32 48 64"
 OUT_DIR="logs/csv"
 MODE="minimal"
+USER_BATCH_LIST=""
 
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -52,6 +53,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     --batch-list)
       BATCH_LIST="$2"
+      USER_BATCH_LIST="$2"
       shift; shift
       ;;
     --out-dir)
@@ -69,7 +71,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ "$MODE" == "minimal" ]]; then
+if [[ -z "$USER_BATCH_LIST" && "$MODE" == "minimal" ]]; then
   BATCH_LIST="32 48"
 elif [[ "$MODE" == "full" ]]; then
   :
@@ -103,6 +105,7 @@ echo "timestamp,dataset,img_size,batch_size,amp,workers,status,images_per_sec,ma
 
 echo "[INFO] Summary: $SUMMARY_FILE"
 echo "[INFO] Mode: $MODE"
+echo "[INFO] BATCH_LIST: $BATCH_LIST"
 
 run_case() {
   local batch_size="$1"
