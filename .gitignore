@@ -1,0 +1,14 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs and outputs
+logs/
+checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
