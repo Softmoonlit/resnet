@@ -3,6 +3,7 @@ set -euo pipefail
 
 # Usage:
 #   bash scripts/benchmark_matrix.sh --dataset imagenet100 --data-dir ./data/imagenet100
+#   bash scripts/benchmark_matrix.sh --mode full --dataset tiny-imagenet --data-dir ./data/tiny-imagenet
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -16,6 +17,7 @@ WARMUP_STEPS="100"
 BENCHMARK_STEPS="300"
 BATCH_LIST="8 16 24 32 48 64"
 OUT_DIR="logs/csv"
+MODE="minimal"
 
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -56,12 +58,25 @@ while [[ $# -gt 0 ]]; do
       OUT_DIR="$2"
       shift; shift
       ;;
+    --mode)
+      MODE="$2"
+      shift; shift
+      ;;
     *)
       echo "Unknown arg: $1"
       exit 1
       ;;
   esac
 done
+
+if [[ "$MODE" == "minimal" ]]; then
+  BATCH_LIST="32 48"
+elif [[ "$MODE" == "full" ]]; then
+  :
+else
+  echo "[ERROR] Invalid --mode: ${MODE}. Use minimal or full."
+  exit 1
+fi
 
 # Resolve relative paths against project root so the script works from any cwd.
 if [[ "${DATA_DIR}" != /* ]]; then
@@ -87,6 +102,7 @@ SUMMARY_FILE="$OUT_DIR/benchmark_matrix_${DATASET}_${TS}.csv"
 echo "timestamp,dataset,img_size,batch_size,amp,workers,status,images_per_sec,max_memory_mb,raw" > "$SUMMARY_FILE"
 
 echo "[INFO] Summary: $SUMMARY_FILE"
+echo "[INFO] Mode: $MODE"
 
 run_case() {
   local batch_size="$1"

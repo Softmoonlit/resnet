@@ -5,6 +5,7 @@ set -euo pipefail
 # Usage:
 #   bash scripts/run_stage_b_round3.sh
 #   bash scripts/run_stage_b_round3.sh --dataset tiny-imagenet --data-dir ./data/tiny-imagenet --batch-size 32 --img-size 224 --epochs 5
+#   bash scripts/run_stage_b_round3.sh --mode full --dataset tiny-imagenet --data-dir ./data/tiny-imagenet
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -15,8 +16,9 @@ BATCH_SIZE="32"
 IMG_SIZE="224"
 EPOCHS="5"
 SEED="42"
-WORKERS_LIST="2 4 6"
+WORKERS_LIST="4 6"
 PREFETCH_FACTOR="2"
+MODE="minimal"
 
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -53,12 +55,25 @@ while [[ $# -gt 0 ]]; do
       PREFETCH_FACTOR="$2"
       shift; shift
       ;;
+    --mode)
+      MODE="$2"
+      shift; shift
+      ;;
     *)
       echo "Unknown arg: $1"
       exit 1
       ;;
   esac
 done
+
+if [[ "$MODE" == "minimal" ]]; then
+  WORKERS_LIST="4 6"
+elif [[ "$MODE" == "full" ]]; then
+  WORKERS_LIST="2 4 6"
+else
+  echo "[ERROR] Invalid --mode: ${MODE}. Use minimal or full."
+  exit 1
+fi
 
 if [[ "${DATA_DIR}" != /* ]]; then
   DATA_DIR="${PROJECT_ROOT}/${DATA_DIR#./}"
@@ -71,6 +86,9 @@ if [[ ! -d "${DATA_DIR}/train" || ! -d "${DATA_DIR}/val" ]]; then
 fi
 
 cd "${PROJECT_ROOT}"
+
+echo "[INFO] Mode: ${MODE}"
+echo "[INFO] WORKERS_LIST: ${WORKERS_LIST}"
 
 for workers in ${WORKERS_LIST}; do
   run_name="b3_img${IMG_SIZE}_bs${BATCH_SIZE}_w${workers}"

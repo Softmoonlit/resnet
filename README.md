@@ -93,6 +93,22 @@ bash scripts/benchmark_matrix.sh \
 
 This runs AMP-only benchmark sweeps over batch sizes and writes a matrix CSV in `logs/csv`.
 
+### Stage B Minimal Retest (Recommended)
+
+```bash
+bash scripts/run_stage_b_minimal_retest.sh \
+  --dataset tiny-imagenet \
+  --data-dir ./data/tiny-imagenet \
+  --epochs 5
+```
+
+This performs the minimal set in one command:
+- batch-size: 32, 48
+- img-size: 224, 256
+- workers: 4, 6
+
+If you want broader coverage, switch individual scripts to full mode using `--mode full`.
+
 ### Stage B Round 2 (Image Size Sweep, One Command)
 
 ```bash
