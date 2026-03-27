@@ -71,8 +71,10 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -z "$USER_BATCH_LIST" && "$MODE" == "minimal" ]]; then
-  BATCH_LIST="32 48"
+if [[ "$MODE" == "minimal" ]]; then
+  if [[ -z "$USER_BATCH_LIST" ]]; then
+    BATCH_LIST="32 48"
+  fi
 elif [[ "$MODE" == "full" ]]; then
   :
 else
